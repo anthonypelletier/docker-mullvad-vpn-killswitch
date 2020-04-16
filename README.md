@@ -7,14 +7,14 @@ git clone https://github.com/anthonypelletier/docker-mullvad-vpn-killswitch.git
 touch docker-compose.yml
 ```
 
-Put this content inside and replace VPN_USERPASS and choose a country to use.
+Replace VPN_USERPASS and VPN_COUNTRY
 ```yaml
 version: '3'
 services:
   vpn:
     container_name: vpn
     build:
-      context: ./docker-vpn-killswitch
+      context: ./docker-mullvad-vpn-killswitch
     cap_add:
       - NET_ADMIN
     devices:
@@ -23,7 +23,7 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
     environment:
       - VPN_COUNTRY=fr
-      - VPN_USERPASS=<REPLACE_ME>
+      - VPN_USERPASS=*****
     restart: unless-stopped
 
   alpine:

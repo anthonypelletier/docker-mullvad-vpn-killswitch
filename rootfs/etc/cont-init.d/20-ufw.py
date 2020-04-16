@@ -1,10 +1,11 @@
-#!/usr/local/bin/python3
+#!/usr/bin/with-contenv /usr/bin/python3
+import sys
 import os
 import re
-import pydig
-import pyufw
+import pydig as dig
+import pyufw as ufw
 
-ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
 CONFIG_PATH = os.path.join(ROOT_PATH, 'etc', 'openvpn')
 
 
@@ -19,32 +20,33 @@ def get_allowed_ips(country=None):
 
     ips = dict()
     for name, port in hosts.items():
-        for ip in pydig.query('{}.mullvad.net'.format(name), 'A'):
+        for ip in dig.query('{}.mullvad.net'.format(name), 'A'):
             ips[ip] = port
     return ips
 
 
 def setup_killswitch(ips):
-    pyufw.reset(force=True)
-    pyufw.default(incoming='deny', outgoing='deny', routed='reject')
-    pyufw.add("allow out on tun+")
-    pyufw.add("allow in on tun+")
-    pyufw.add("allow out on lo")
-    pyufw.add("allow in on lo")
-    pyufw.add("allow out to any port 53")
-    pyufw.add("allow in from any port 53")
+    ufw.reset(force=True)
+    ufw.default(incoming='deny', outgoing='deny', routed='reject')
+    ufw.add("allow out on tun+")
+    ufw.add("allow in on tun+")
+    ufw.add("allow out on lo")
+    ufw.add("allow in on lo")
+    ufw.add("allow out to any port 53")
+    ufw.add("allow in from any port 53")
     for ip, port in ips.items():
-        pyufw.add("allow out on eth+ to {} port {} proto udp".format(ip, port))
-        pyufw.add("allow in on eth+ from {} port {} proto udp".format(ip, port))
-    pyufw.add("allow out to 172.0.0.0/8")
-    pyufw.add("allow in to 172.0.0.0/8")
+        ufw.add("allow out on eth+ to {} port {} proto udp".format(ip, port))
+        ufw.add("allow in on eth+ from {} port {} proto udp".format(ip, port))
+    ufw.add("allow out to 172.0.0.0/8")
+    ufw.add("allow in to 172.0.0.0/8")
+    ufw.enable()
 
 
 def setup_userpass(userpass):
     if userpass is None:
         print('Error: Please set VPN_USERPASS environment variable !')
         exit(1)
-    with open(os.path.join(CONFIG_PATH, 'mullvad_userpass.txt'), 'w') as userpassfile:
+    with open(os.path.join(CONFIG_PATH, 'mullvad_userpass.txt'), 'w+') as userpassfile:
         userpassfile.write('{}\nm'.format(userpass))
 
 
