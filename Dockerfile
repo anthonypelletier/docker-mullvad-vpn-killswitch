@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     openvpn \
     curl
 
-RUN pip install -U \
+RUN pip3 install -U \
     pip \
     pydig \
     pyufw
