@@ -8,7 +8,7 @@ RUN echo "@testing http://dl-4.alpinelinux.org/alpine/edge/testing" >> /etc/apk/
 
 RUN apk add --no-cache \
     python3 \
-    python3-dev
+    python3-dev \
     ufw@testing \
     bind-tools \
     openvpn \
