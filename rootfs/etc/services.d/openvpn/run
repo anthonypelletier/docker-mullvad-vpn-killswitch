@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv sh
+cd /etc/openvpn/ && /usr/sbin/openvpn --config mullvad_${VPN_COUNTRY}_all.conf
